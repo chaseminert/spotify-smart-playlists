@@ -14,7 +14,7 @@ logger = setup_logging()
 def main():
     """Run authentication, collection, and playlist rebuild steps."""
     args = parse_args()
-    sp = get_spotify_client()
+    sp = get_spotify_client(require_token_cache=not args.auth_only)
     if args.auth_only:
         user = sp.current_user()
         logger.info(f"Spotify authentication complete for account: {user['id']}")

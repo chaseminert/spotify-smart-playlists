@@ -1,5 +1,6 @@
 """Spotify API helpers shared across collection and playlist rebuild flows."""
 
+from pathlib import Path
 import settings
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
@@ -17,19 +18,27 @@ from logging_setup.logging_config import setup_logging
 logger = setup_logging()
 
 
-def get_spotify_client() -> spotipy.Spotify:
+def get_spotify_client(require_token_cache: bool = True) -> spotipy.Spotify:
     """
     Build an authenticated Spotipy client with token caching enabled.
 
     First-time authorization must be completed interactively so Spotify can
     issue the initial refresh token. Subsequent runs reuse the cached token.
     """
+    cache_path = Path(settings.SPOTIFY_CACHE_PATH)
+    if require_token_cache and not cache_path.exists():
+        raise FileNotFoundError(
+            "Spotify token cache not found at "
+            f"{cache_path}. Run `docker compose run --rm app --auth-only` "
+            "to authenticate once before starting the scheduler."
+        )
+
     auth_manager = SpotifyOAuth(
         client_id=settings.SPOTIFY_CLIENT_ID,
         client_secret=settings.SPOTIFY_CLIENT_SECRET,
         redirect_uri=settings.SPOTIFY_REDIRECT_URI,
         scope=settings.SPOTIFY_SCOPE,
-        cache_path=settings.SPOTIFY_CACHE_PATH,
+        cache_path=str(cache_path),
         open_browser=False,  # good default for headless; first run you'll copy/paste URL
     )
     return spotipy.Spotify(auth_manager=auth_manager)
@@ -140,5 +149,4 @@ def shuffle_playlist(sp: spotipy.Spotify, playlist_id: str):
     logger.debug(f"Playlist description set for id {playlist_id}: '{playlist_desc}'")
 
     logger.debug(f"Shuffled playlist: {playlist_id}")
-
 
