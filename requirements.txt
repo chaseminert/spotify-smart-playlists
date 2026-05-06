@@ -1,0 +1,5 @@
+loguru==0.7.3
+python-dotenv==1.2.2
+pytz==2025.2
+spotipy==2.26.0
+SQLAlchemy==2.0.49

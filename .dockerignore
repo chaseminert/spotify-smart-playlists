@@ -1,0 +1,14 @@
+.git
+.idea
+.codex
+venv
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+logs
+database/history.db
+.spotipy-cache
+.env
+config.json

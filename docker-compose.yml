@@ -1,0 +1,42 @@
+x-app-base: &app-base
+  build:
+    context: .
+  image: spotify-smart-playlist:latest
+  env_file:
+    - .env
+  environment:
+    DISPLAY_TZ: ${DISPLAY_TZ:-UTC}
+  volumes:
+    - ./config.json:/app/config.json
+    - ./database/history.db:/app/database/history.db
+    - ./logs:/app/logs
+    - ./.spotipy-cache:/app/.spotipy-cache
+
+x-scheduler-base: &scheduler-base
+  <<: *app-base
+  environment:
+    DISPLAY_TZ: ${DISPLAY_TZ:-UTC}
+    CRON_SCHEDULE: ${CRON_SCHEDULE:-0 * * * *}
+    RUN_ON_STARTUP: ${RUN_ON_STARTUP:-false}
+  entrypoint: ["/app/docker/scheduler-entrypoint.sh"]
+  restart: unless-stopped
+
+services:
+  app:
+    <<: *app-base
+    entrypoint: ["/app/docker/run-main.sh"]
+    restart: "no"
+
+  shuffler:
+    <<: *app-base
+    entrypoint: ["python", "-m", "playlist.playlist_shuffler"]
+    stdin_open: true
+    tty: true
+    restart: "no"
+
+  scheduler:
+    <<: *scheduler-base
+
+  scheduler_force:
+    <<: *scheduler-base
+    entrypoint: ["/app/docker/scheduler-entrypoint.sh", "--force"]

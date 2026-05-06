@@ -1,0 +1,17 @@
+{
+  "template_suffix": "Template",
+  "smart_suffix": "Smart",
+  "shuffle_on_rebuild": false,
+  "days_not_played_default": 21,
+  "playlist_data": {
+    "Playlist 1": {
+      "days_not_played": 30
+    },
+    "Playlist 2": {
+      "days_not_played": 10
+    },
+    "Playlist 3": {
+      "days_not_played": 10
+    }
+  }
+}
