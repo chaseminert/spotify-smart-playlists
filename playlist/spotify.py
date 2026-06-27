@@ -1,6 +1,9 @@
 """Spotify API helpers shared across collection and playlist rebuild flows."""
 
 from pathlib import Path
+
+from spotipy import CacheFileHandler
+
 import settings
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
@@ -33,15 +36,35 @@ def get_spotify_client(require_token_cache: bool = True) -> spotipy.Spotify:
             "to authenticate once before starting the scheduler."
         )
 
+    if not require_token_cache and cache_path.exists():
+        cache_path.unlink(missing_ok=True)
+        logger.debug("Wiped old token cache directory before authentication")
+
+    cache_handler = CacheFileHandler(cache_path=str(settings.SPOTIFY_CACHE_PATH))
+
     auth_manager = SpotifyOAuth(
         client_id=settings.SPOTIFY_CLIENT_ID,
         client_secret=settings.SPOTIFY_CLIENT_SECRET,
         redirect_uri=settings.SPOTIFY_REDIRECT_URI,
         scope=settings.SPOTIFY_SCOPE,
-        cache_path=str(cache_path),
+        cache_handler=cache_handler,
         open_browser=False,  # good default for headless; first run you'll copy/paste URL
     )
-    return spotipy.Spotify(auth_manager=auth_manager)
+    sp = spotipy.Spotify(auth_manager=auth_manager)
+
+    try:
+        sp.current_user()
+        logger.info("Spotify authentication successful.")
+        return sp
+    except spotipy.exceptions.SpotifyOauthError as exc:
+        exc_text = str(exc).lower()
+        if "invalid_grant" in exc_text:
+            logger.critical(
+            "Spotify refresh token has expired after 6 months. "
+            "Run `docker compose run --rm app --auth-only` to re-authenticate and retrieve a new refresh token")
+            exit(-1)
+        else:
+            raise
 
 
 def get_playlist_length(sp: spotipy.Spotify, playlist_id):

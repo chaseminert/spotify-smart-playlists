@@ -16,9 +16,9 @@ def main():
     args = parse_args()
     sp = get_spotify_client(require_token_cache=not args.auth_only)
     if args.auth_only:
-        user = sp.current_user()
-        logger.info(f"Spotify authentication complete for account: {user['id']}")
+        logger.info("Authentication complete. Pipeline is ready to run.")
         return
+
     upsert_info: UpsertInfo = collector.run(sp)
     if upsert_info.updated == 0 and upsert_info.inserted == 0 and not args.force:
         logger.debug("Skipping playlist rebuild since nothing was updated")

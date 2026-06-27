@@ -115,7 +115,7 @@ Add tracks to those playlists. The app will create matching smart playlists auto
 docker compose build
 ```
 
-### 6. Authenticate Spotify once
+### 6. Authenticate Spotify
 
 The first run requires interactive Spotify authorization so the token cache can be written under `.spotipy-cache/`.
 
@@ -132,6 +132,9 @@ After a successful first run, you should have:
 - `.spotipy-cache/` for Spotify auth tokens
 - `database/history.db` for local play history
 - log files under `logs/`
+
+Note: As of July 2026, refresh tokens expire after 6 months. To avoid errors,
+ it is recommended to run the above command before the refresh token expires.
 
 ### 7. Start the scheduler
 
