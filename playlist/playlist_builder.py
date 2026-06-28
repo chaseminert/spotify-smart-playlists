@@ -7,7 +7,10 @@ from datetime import datetime
 from logging_setup.logging_config import setup_logging
 from .spotify import get_spotify_client, get_playlist_length, get_playlist_tracks, add_songs_to_playlist, \
     get_playlists, get_current_track_isrc, get_track_isrc
-import settings
+
+from settings import get_settings
+
+settings = get_settings()
 logger = setup_logging()
 
 

@@ -21,11 +21,11 @@ def main():
 
     upsert_info: UpsertInfo = collector.run(sp)
     if upsert_info.updated == 0 and upsert_info.inserted == 0 and not args.force:
-        logger.debug("Skipping playlist rebuild since nothing was updated")
+        logger.debug("Skipping playlist rebuild since nothing was updated.")
         return
-    logger.info("Running playlist builder")
+    logger.info("Running playlist builder.")
     playlist_builder.run(sp)
-    logger.info("Spotify smart playlist pipeline complete")
+    logger.info("Spotify smart playlist pipeline complete.")
 
 
 def parse_args():

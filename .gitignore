@@ -212,4 +212,5 @@ __marimo__/
 # this project
 database/*.db
 config.json
+state.json
 .spotipy-cache

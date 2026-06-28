@@ -1,17 +1,22 @@
 """Spotify API helpers shared across collection and playlist rebuild flows."""
-
 from pathlib import Path
 
+from dateutil.relativedelta import relativedelta
 from spotipy import CacheFileHandler
 
-import settings
+from settings import get_settings
+settings = get_settings()
+
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
-from datetime import datetime
+from datetime import datetime, timedelta, date
 from datetime import timezone
 import random
 
 from database.setup import init_db
+from util.json_util.json_state import update_json_state
+from util.notifications import send_noti
+
 init_db()
 
 UTC = timezone.utc
@@ -38,6 +43,7 @@ def get_spotify_client(require_token_cache: bool = True) -> spotipy.Spotify:
 
     if not require_token_cache and cache_path.exists():
         cache_path.unlink(missing_ok=True)
+        update_json_state('expiration_notification_sent', False)
         logger.debug("Wiped old token cache directory before authentication")
 
     cache_handler = CacheFileHandler(cache_path=str(settings.SPOTIFY_CACHE_PATH))
@@ -55,6 +61,29 @@ def get_spotify_client(require_token_cache: bool = True) -> spotipy.Spotify:
     try:
         sp.current_user()
         logger.info("Spotify authentication successful.")
+        if not require_token_cache:
+            token_expires_at = datetime.now() + relativedelta(months=6)
+            update_json_state('token_expires_on', token_expires_at.date())
+            logger.info(f"Your Spotify account is authenticated until {token_expires_at.date().isoformat()}")
+
+        today = date.today()
+        token_expires_on = settings.STATE_DATA.get('token_expires_on', (today + timedelta(days=15)))
+        num_days_till_expiration = (token_expires_on - today).days
+        sent_expiration_noti = settings.STATE_DATA.get('expiration_notification_sent', False)
+
+        expiration_warning_msg = f"Your Spotify refresh token expires in {num_days_till_expiration} days. " \
+                                  "To re-authenticate, Run `docker compose run --rm app --auth-only`"
+
+        if num_days_till_expiration <= 10:
+            logger.warning(expiration_warning_msg)
+
+            if sent_expiration_noti:
+                logger.debug("Skipping expiration notification since it has already been sent.")
+            else:
+                noti_sent = send_noti("Spotify refresh token is near expiration", expiration_warning_msg)
+                if noti_sent:
+                    update_json_state("expiration_notification_sent", True)
+
         return sp
     except spotipy.exceptions.SpotifyOauthError as exc:
         exc_text = str(exc).lower()

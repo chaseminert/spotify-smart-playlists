@@ -74,9 +74,14 @@ SPOTIFY_CLIENT_SECRET=your_client_secret
 DISPLAY_TZ=America/Denver
 CRON_SCHEDULE=0 * * * *
 RUN_ON_STARTUP=false
+PUSH_APP_TOKEN=
+PUSH_USER_TOKEN=
 ```
 
 `DISPLAY_TZ` is optional. If omitted, Docker Compose defaults it to `UTC`.
+`PUSH_APP_TOKEN` and `PUSH_USER_TOKEN` are optional Pushover credentials. If
+both are set, the app will send a Pushover notification when your Spotify
+refresh token is about to expire.
 
 `config.json` example:
 
@@ -133,8 +138,10 @@ After a successful first run, you should have:
 - `database/history.db` for local play history
 - log files under `logs/`
 
-Note: As of July 2026, refresh tokens expire after 6 months. To avoid errors,
- it is recommended to run the above command before the refresh token expires.
+Note: Starting in July 2026, Spotify refresh tokens expire after 6 months. If
+you download [Pushover](https://pushover.net/) and set `PUSH_APP_TOKEN` and `PUSH_USER_TOKEN` in your `.env` file, the
+app will notify you when the refresh token is near expiration so you can run the
+above command again before scheduled syncs start failing.
 
 ### 7. Start the scheduler
 
