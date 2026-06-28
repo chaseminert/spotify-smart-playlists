@@ -139,7 +139,7 @@ After a successful first run, you should have:
 - log files under `logs/`
 
 Note: Starting in July 2026, Spotify refresh tokens expire after 6 months. If
-you download [Pushover](https://pushover.net/) and set `PUSH_APP_TOKEN` and `PUSH_USER_TOKEN` in your `.env` file, the
+you download and setup [Pushover](https://pushover.net/) and set `PUSH_APP_TOKEN` and `PUSH_USER_TOKEN` in your `.env` file, the
 app will notify you when the refresh token is near expiration so you can run the
 above command again before scheduled syncs start failing.
 
