@@ -216,6 +216,30 @@ Run the interactive playlist shuffler helper:
 docker compose run --rm shuffler
 ```
 
+## Tests
+
+Tests run inside Docker, using the same image and dependencies as the app.
+
+The unit tests cover the core behavior that can be verified without calling
+Spotify:
+
+- JSON date encoding and decoding used by local state files
+- recently played timestamp normalization and database upsert behavior
+- Spotify helper pagination, playlist batching, shuffling, and current-track handling
+- smart playlist creation and rebuild filtering rules
+
+After changing dependencies or test files, rebuild the image:
+
+```bash
+docker compose build app
+```
+
+Run the full unit test suite:
+
+```bash
+docker compose run --rm --entrypoint python app -m pytest
+```
+
 ## Configuration Reference
 
 - `template_suffix`: suffix used to identify source playlists
