@@ -61,7 +61,7 @@ This project uses these Spotify permissions:
 
 ```bash
 cp .env.example .env
-cp config-template.json config.json
+cp config/config-template.json config/config.json
 ```
 
 Then update `.env` and `config.json`.

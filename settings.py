@@ -17,7 +17,7 @@ logger = setup_logging()
 
 class AppSettings:
     DISPLAY_TZ: StaticTzInfo = pytz.timezone(os.environ["DISPLAY_TZ"])
-    JSON_PATH: Path = Path(__file__).parent / "config.json"
+    JSON_PATH: Path = Path(__file__).parent / "config" / "config.json"
     STATE_PATH: Path = Path(__file__).parent / "state" / "state.json"
 
     if not JSON_PATH.exists():

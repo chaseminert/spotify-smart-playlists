@@ -8,7 +8,7 @@ x-app-base: &app-base
   environment:
     DISPLAY_TZ: ${DISPLAY_TZ:-UTC}
   volumes:
-    - ./config.json:/app/config.json
+    - ./config:/app/config
     - ./state:/app/state
     - ./database:/app/database
     - ./logs:/app/logs
