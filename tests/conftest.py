@@ -8,7 +8,7 @@ from pathlib import Path
 
 
 _ROOT = Path(__file__).resolve().parents[1]
-_CONFIG_PATH = _ROOT / "config.json"
+_CONFIG_PATH = _ROOT / "config" / "config.json"
 _CREATED_CONFIG = False
 
 
@@ -21,6 +21,7 @@ def pytest_configure():
     os.environ.setdefault("SPOTIFY_CLIENT_SECRET", "test-client-secret")
 
     if not _CONFIG_PATH.exists():
+        _CONFIG_PATH.parent.mkdir(exist_ok=True)
         _CONFIG_PATH.write_text(
             json.dumps(
                 {
