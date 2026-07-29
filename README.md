@@ -1,5 +1,7 @@
 # Spotify Smart Playlist
 
+![Tests](https://github.com/chaseminert/spotify-smart-playlists/actions/workflows/tests.yml/badge.svg)
+
 Build and maintain Spotify playlists based on how recently you played each track.
 
 This project watches your recent listening history, stores last-played timestamps in a local SQLite database, and rebuilds "smart" playlists from template playlists in your Spotify account.
