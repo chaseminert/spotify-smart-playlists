@@ -99,7 +99,7 @@ def get_spotify_client(require_token_cache: bool = True) -> spotipy.Spotify:
 def get_playlist_length(sp: spotipy.Spotify, playlist_id):
     """Return the total number of tracks currently in a playlist."""
     playlist = sp.playlist(playlist_id)
-    return playlist['tracks']['total']
+    return playlist['items']['total']
 
 
 def get_track_isrc(sp: spotipy.Spotify, track: dict):
@@ -144,7 +144,7 @@ def get_playlists(sp: spotipy.Spotify) -> dict[str, dict]:
 def get_playlist_tracks(sp: spotipy.Spotify, playlist_id) -> list[dict]:
     """Fetch every track item from a playlist, following Spotify pagination."""
     tracks = []
-    results = sp.playlist_items(playlist_id, limit=100)
+    results = sp.playlist_items(playlist_id, limit=50)
 
     tracks += results["items"]
 
@@ -201,7 +201,7 @@ def shuffle_playlist(sp: spotipy.Spotify, playlist_id: str):
     playlist_tracks = get_playlist_tracks(sp, playlist_id)
     song_ids = []
     for item in playlist_tracks:
-        track = item.get("track")
+        track = item.get("item")
         if not track or not track.get("id"):
             continue
 

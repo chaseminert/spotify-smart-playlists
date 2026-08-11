@@ -52,9 +52,6 @@ def ensure_smart_playlists_exist(sp):
     ``settings.TEMPLATE_SUFFIX``. For each template, this function ensures that
     a sibling playlist ending with ``settings.SMART_SUFFIX`` exists.
     """
-    me = sp.me()
-    user_id = me["id"]
-
     playlists = get_playlists(sp)
 
     for name, playlist in playlists.items():
@@ -65,8 +62,7 @@ def ensure_smart_playlists_exist(sp):
 
         if smart_name not in playlists:
             logger.info(f"Creating new playlist: {smart_name}")
-            sp.user_playlist_create(
-                user=user_id,
+            sp.current_user_playlist_create(
                 name=smart_name,
                 public=False
             )
@@ -106,7 +102,7 @@ def rebuild_smart_playlist(sp, session, template_id: str, smart_id: str, base_na
     logger.debug(f"Number of days: {num_days}")
 
     for item in template_tracks:
-        track = item.get("track")
+        track = item.get("item")
         if not track or not track.get("id"):
             continue
 
