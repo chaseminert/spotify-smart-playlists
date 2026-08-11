@@ -79,7 +79,7 @@ def test_rebuild_smart_playlist_filters_tracks_and_updates_description(monkeypat
         lambda sp, playlist_id: [
             {"item": {"id": "stale-track", "external_ids": {"isrc": "STALE"}}},
             {"item": {"id": "recent-track", "external_ids": {"isrc": "RECENT"}}},
-            {"item": {"item": "current-track", "external_ids": {"isrc": "CURRENT"}}},
+            {"item": {"id": "current-track", "external_ids": {"isrc": "CURRENT"}}},
             {"item": {"external_ids": {"isrc": "NO_ID"}}},
             {"item": None},
         ],
