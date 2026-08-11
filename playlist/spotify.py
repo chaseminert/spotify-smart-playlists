@@ -120,7 +120,7 @@ def get_track_isrc(sp: spotipy.Spotify, track: dict):
         isrc = isrc_extractor(full_track)
 
 
-    if isrc is None:
+    if isrc is None and track_id is not None:
         logger.warning(f"Track is missing ISRC: '{track['id']}'")
 
     return isrc
