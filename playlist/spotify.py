@@ -102,11 +102,27 @@ def get_playlist_length(sp: spotipy.Spotify, playlist_id):
     return playlist['tracks']['total']
 
 
-def get_track_isrc(track: dict):
+def get_track_isrc(sp: spotipy.Spotify, track: dict):
     """Extract a track's ISRC, logging when Spotify omits the identifier."""
-    isrc = track.get("external_ids", {}).get("isrc")
+
+    isrc_extractor = lambda t: t.get("external_ids", {}).get("isrc")
+
+    isrc = isrc_extractor(track)
+
+    if isrc:
+        return isrc
+
+    #  fallback incase Spotify API doesn't return "external_ids" field in tracklist
+
+    track_id = track.get("id")
+    if track_id:
+        full_track = sp.track(track_id)
+        isrc = isrc_extractor(full_track)
+
+
     if isrc is None:
         logger.warning(f"Track is missing ISRC: '{track['id']}'")
+
     return isrc
 
 
@@ -171,13 +187,13 @@ def get_current_track_isrc(sp) -> str | None:
     if item is None:
         return None
 
-    return get_track_isrc(item)
+    return get_track_isrc(sp, item)
 
 
 def track_id_to_isrc(sp: spotipy.Spotify, track_id: str):
     """Resolve a Spotify track ID to its ISRC."""
     track = sp.track(track_id)
-    return get_track_isrc(track)
+    return get_track_isrc(sp, track)
 
 
 def shuffle_playlist(sp: spotipy.Spotify, playlist_id: str):
