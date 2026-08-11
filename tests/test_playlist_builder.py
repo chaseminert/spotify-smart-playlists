@@ -9,11 +9,8 @@ class FakeSpotify:
         self.created = []
         self.changed_details = []
 
-    def me(self):
-        return {"id": "user-1"}
-
-    def user_playlist_create(self, user, name, public):
-        self.created.append({"user": user, "name": name, "public": public})
+    def current_user_playlist_create(self, name, public):
+        self.created.append({"name": name, "public": public})
 
     def playlist_change_details(self, playlist_id, description):
         self.changed_details.append({"playlist_id": playlist_id, "description": description})
@@ -60,7 +57,7 @@ def test_ensure_smart_playlists_exist_creates_missing_smart_playlist(monkeypatch
 
     playlist_builder.ensure_smart_playlists_exist(sp)
 
-    assert sp.created == [{"user": "user-1", "name": "Gym Smart", "public": False}]
+    assert sp.created == [{"name": "Gym Smart", "public": False}]
 
 
 def test_rebuild_smart_playlist_filters_tracks_and_updates_description(monkeypatch):
@@ -80,11 +77,11 @@ def test_rebuild_smart_playlist_filters_tracks_and_updates_description(monkeypat
         playlist_builder,
         "get_playlist_tracks",
         lambda sp, playlist_id: [
-            {"track": {"id": "stale-track", "external_ids": {"isrc": "STALE"}}},
-            {"track": {"id": "recent-track", "external_ids": {"isrc": "RECENT"}}},
-            {"track": {"id": "current-track", "external_ids": {"isrc": "CURRENT"}}},
-            {"track": {"external_ids": {"isrc": "NO_ID"}}},
-            {"track": None},
+            {"item": {"id": "stale-track", "external_ids": {"isrc": "STALE"}}},
+            {"item": {"id": "recent-track", "external_ids": {"isrc": "RECENT"}}},
+            {"item": {"item": "current-track", "external_ids": {"isrc": "CURRENT"}}},
+            {"item": {"external_ids": {"isrc": "NO_ID"}}},
+            {"item": None},
         ],
     )
     monkeypatch.setattr(playlist_builder, "get_playlist_length", lambda sp, playlist_id: 7)

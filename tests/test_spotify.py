@@ -16,9 +16,25 @@ class FakeSpotify:
 
     def playlist_items(self, playlist_id, limit):
         return {
-            "items": [{"track": {"id": "track-1"}}],
+            "items": [{"item": {"id": "track-1"}}],
             "next": True,
         }
+
+    def playlist(self, playlist_id):
+        return {
+            "items": {
+                "total": 42
+            }
+        }
+
+    def track(self, track_id):
+        return {
+            "id": track_id,
+            "external_ids": {
+                "isrc": "USRC17607839"
+            }
+        }
+
 
     def next(self, results):
         return self.next_pages.pop(0)
@@ -53,12 +69,12 @@ def test_get_playlists_follows_pagination():
 def test_get_playlist_tracks_follows_pagination():
     sp = FakeSpotify()
     sp.next_pages = [
-        {"items": [{"track": {"id": "track-2"}}], "next": False},
+        {"items": [{"item": {"id": "track-2"}}], "next": False},
     ]
 
     tracks = spotify.get_playlist_tracks(sp, "playlist-1")
 
-    assert tracks == [{"track": {"id": "track-1"}}, {"track": {"id": "track-2"}}]
+    assert tracks == [{"item": {"id": "track-1"}}, {"item": {"id": "track-2"}}]
 
 
 def test_add_songs_to_playlist_wipes_and_batches_tracks():
@@ -96,3 +112,19 @@ def test_get_current_track_isrc_returns_current_item_isrc():
     sp.playback = {"item": {"id": "track-1", "external_ids": {"isrc": "USRC17607839"}}}
 
     assert spotify.get_current_track_isrc(sp) == "USRC17607839"
+
+def test_get_playlist_length_uses_items():
+    sp = FakeSpotify()
+    assert spotify.get_playlist_length(sp, "playlist-1") == 42
+
+def test_get_track_isrc_fetches_full_track_when_missing():
+    sp = FakeSpotify()
+    track = {
+        "id": "track-1"
+    }
+    assert spotify.get_track_isrc(
+        sp,
+        track
+    ) == "USRC17607839"
+
+
