@@ -111,7 +111,7 @@ def rebuild_smart_playlist(sp, session, template_id: str, smart_id: str, base_na
             continue
 
         track_id = track["id"]
-        track_isrc = get_track_isrc(track)
+        track_isrc = get_track_isrc(sp, track)
 
         if track_isrc == current_track_isrc:
             logger.debug("Skipping currently playing track")
