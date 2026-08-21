@@ -31,7 +31,7 @@ def run(sp: spotipy.Spotify) -> UpsertInfo:
             if not track or not track.get('id'):
                 continue
 
-            track_isrc = get_track_isrc(sp, track)
+            track_isrc = get_track_isrc(sp, track, session)
             if track_isrc is None:
                 continue
 

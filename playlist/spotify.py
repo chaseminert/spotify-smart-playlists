@@ -4,6 +4,7 @@ from pathlib import Path
 from dateutil.relativedelta import relativedelta
 from spotipy import CacheFileHandler
 
+from database.models import TrackMetadata
 from settings import get_settings
 settings = get_settings()
 
@@ -102,7 +103,7 @@ def get_playlist_length(sp: spotipy.Spotify, playlist_id):
     return playlist['items']['total']
 
 
-def get_track_isrc(sp: spotipy.Spotify, track: dict):
+def get_track_isrc(sp: spotipy.Spotify, track: dict, session=None):
     """Extract a track's ISRC, logging when Spotify omits the identifier."""
 
     isrc_extractor = lambda t: t.get("external_ids", {}).get("isrc")
@@ -115,13 +116,27 @@ def get_track_isrc(sp: spotipy.Spotify, track: dict):
     #  fallback incase Spotify API doesn't return "external_ids" field in tracklist
 
     track_id = track.get("id")
-    if track_id:
+    if track_id and session is not None:
+        cached = session.get(TrackMetadata, track_id)
+        if cached:
+            return cached.track_isrc
+
+    elif track_id:
         full_track = sp.track(track_id)
         isrc = isrc_extractor(full_track)
+
+        #  add to cache
+        if all(v is not None for v in (isrc, session)):
+            new_item = session.add(TrackMetadata(
+                track_id=track_id,
+                track_isrc=isrc
+            ))
+            logger.debug(f"New track added to cache: {new_item}")
 
 
     if isrc is None and track_id is not None:
         logger.warning(f"Track is missing ISRC: '{track['id']}'")
+
 
     return isrc
 
@@ -188,12 +203,6 @@ def get_current_track_isrc(sp) -> str | None:
         return None
 
     return get_track_isrc(sp, item)
-
-
-def track_id_to_isrc(sp: spotipy.Spotify, track_id: str):
-    """Resolve a Spotify track ID to its ISRC."""
-    track = sp.track(track_id)
-    return get_track_isrc(sp, track)
 
 
 def shuffle_playlist(sp: spotipy.Spotify, playlist_id: str):
