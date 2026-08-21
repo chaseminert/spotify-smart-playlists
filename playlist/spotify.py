@@ -121,7 +121,7 @@ def get_track_isrc(sp: spotipy.Spotify, track: dict, session=None):
         if cached:
             return cached.track_isrc
 
-    elif track_id:
+    if track_id:
         full_track = sp.track(track_id)
         isrc = isrc_extractor(full_track)
 
