@@ -127,10 +127,11 @@ def get_track_isrc(sp: spotipy.Spotify, track: dict, session=None):
 
         #  add to cache
         if all(v is not None for v in (isrc, session)):
-            new_item = session.add(TrackMetadata(
+            new_item = TrackMetadata(
                 track_id=track_id,
                 track_isrc=isrc
-            ))
+            )
+            session.add(new_item)
             logger.debug(f"New track added to cache: {new_item}")
 
 
