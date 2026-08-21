@@ -111,6 +111,7 @@ def get_track_isrc(sp: spotipy.Spotify, track: dict, session=None):
     isrc = isrc_extractor(track)
 
     if isrc:
+        logger.debug("ISRC found from track within tracklist")
         return isrc
 
     #  fallback incase Spotify API doesn't return "external_ids" field in tracklist
@@ -137,6 +138,9 @@ def get_track_isrc(sp: spotipy.Spotify, track: dict, session=None):
 
     if isrc is None and track_id is not None:
         logger.warning(f"Track is missing ISRC: '{track['id']}'")
+
+    if isrc is not None:
+        logger.debug("ISRC found from querying the track")
 
 
     return isrc
