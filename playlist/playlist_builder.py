@@ -113,7 +113,10 @@ def rebuild_smart_playlist(sp, session, template_id: str, smart_id: str, base_na
             logger.debug("Skipping currently playing track")
             continue
 
-        play = session.get(Play, track_isrc)
+
+        play = None
+        if track_isrc:
+            play = session.get(Play, track_isrc)
 
         if play is None or not play.played_within_last_n_days(num_days):
             ids_to_add.append(track_id)
